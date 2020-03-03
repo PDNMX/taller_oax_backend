@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
 });
 
 // create
-router.put('/spic', (req, res) => {
+router.post('/spic', (req, res) => {
 
     const params = [
         "ejercicioFiscal", "periodoEjercicio", "rfc", "curp",
@@ -45,7 +45,7 @@ router.put('/spic', (req, res) => {
 });
 
 // find and update by id
-router.post('/spic', (req, res) => {
+router.put('/spic', (req, res) => {
     const {id} = req.body;
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
        const db = client.db;
@@ -70,22 +70,48 @@ router.delete('/spic', (req, res) => {
 
 // find
 router.get('/spic', (req, res) => {
-    const {
+    const {body} = req;
+
+    let {
         page,
         pageSize
-    } = req.body;
+    } = body;
+
+    if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1){
+        pageSize = 10
+    }
+
+    if (typeof page === 'undefined' || isNaN(page) || page < 1){
+        page = 1;
+    }
 
     const params = ["nombres", "primerApellido", "segundoApellido"];
 
     let query = {};
 
+    params.forEach( p => {
+        if (body.hasOwnProperty(p)) {
+            query[p] = body[p];
+        }
+    });
+
+    console.log(query);
+
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
         const db = client.db();
         const spic = db.collection('spic');
 
-        spic.findOne(query).then(data => {
+        let skip = page === 1 ? 0: (page - 1) * pageSize;
+
+        spic.find(query).skip(skip).limit(pageSize).toArray().then(data => {
             console.log(data);
-            res.json(data);
+            res.json({
+                results: data,
+                pagination: {
+                    page: page,
+                    pageSize: pageSize
+                }
+            });
         });
     });
 });
