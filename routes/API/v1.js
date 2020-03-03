@@ -103,14 +103,19 @@ router.get('/spic', (req, res) => {
 
         let skip = page === 1 ? 0: (page - 1) * pageSize;
 
-        spic.find(query).skip(skip).limit(pageSize).toArray().then(data => {
-            console.log(data);
-            res.json({
-                results: data,
-                pagination: {
-                    page: page,
-                    pageSize: pageSize
-                }
+        let cursor = spic.find(query).skip(skip).limit(pageSize);
+
+        cursor.count().then( totalRows => {
+            cursor.toArray().then(data => {
+                console.log(data);
+                res.json({
+                    results: data,
+                    pagination: {
+                        page: page,
+                        pageSize: pageSize,
+                        totalRows: totalRows
+                    }
+                });
             });
         });
     });
