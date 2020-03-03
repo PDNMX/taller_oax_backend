@@ -77,7 +77,7 @@ router.get('/spic', (req, res) => {
         pageSize
     } = body;
 
-    if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1){
+    if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1 || pageSize > 200){
         pageSize = 10
     }
 
@@ -100,16 +100,18 @@ router.get('/spic', (req, res) => {
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
         const db = client.db();
         const spic = db.collection('spic');
-
         let skip = page === 1 ? 0: (page - 1) * pageSize;
-
         let cursor = spic.find(query).skip(skip).limit(pageSize);
 
         cursor.count().then( totalRows => {
             cursor.toArray().then(data => {
-                console.log(data);
+                //console.log(data);
                 res.json({
-                    results: data,
+                    results: data.map(d => {
+                        d.id = d._id.toString();
+                        delete(d._id);
+                        return d;
+                    }),
                     pagination: {
                         page: page,
                         pageSize: pageSize,
