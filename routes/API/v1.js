@@ -7,7 +7,7 @@ router.use(cors());
 const dbConf = require('../../db_conf');
 const mongoose = require('mongoose');
 const {Spic} = require('../../models');
-const {MongoClient, ObjectId} = require('mongodb');
+const {MongoClient} = require('mongodb');
 
 router.get('/', (req, res) => {
    res.json({
@@ -35,7 +35,7 @@ router.post('/spic', (req, res) => {
     });
 });
 
-// find and update by id
+// find by id and update
 router.put('/spic', (req, res) => {
     const {id, spic} = req.body;
     mongoose.connect(dbConf.url, dbConf.client_options);
@@ -50,7 +50,7 @@ router.put('/spic', (req, res) => {
     });
 });
 
-// delete by id
+// find by id abd delete
 router.delete('/spic', (req, res) => {
     const {id} = req.body;
     mongoose.connect(dbConf.url, dbConf.client_options);
@@ -70,7 +70,9 @@ router.get('/spic', (req, res) => {
 
     let {
         page,
-        pageSize
+        pageSize,
+        sort,
+        query
     } = body;
 
     if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1 || pageSize > 200){
@@ -81,23 +83,28 @@ router.get('/spic', (req, res) => {
         page = 1;
     }
 
-    const params = ["nombres", "primerApellido", "segundoApellido"];
+    const params = [
+        "nombres", "primerApellido", "segundoApellido", "curp", "rfc", "institucionDependencia"
+    ];
 
-    let query = {};
+    let _query = {};
+
+    //tipoProcedimiento
+    //sort
 
     params.forEach( p => {
-        if (body.hasOwnProperty(p)) {
-            query[p] = body[p];
+        if (query.hasOwnProperty(p)) {
+            _query[p] = {$regex: query[p], $options: 'i'};
         }
     });
 
-    console.log(query);
+    console.log(_query);
 
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
         const db = client.db();
         const spic = db.collection('spic');
         let skip = page === 1 ? 0: (page - 1) * pageSize;
-        let cursor = spic.find(query).skip(skip).limit(pageSize);
+        let cursor = spic.find(_query).skip(skip).limit(pageSize);
 
         cursor.count().then( totalRows => {
             cursor.toArray().then(data => {
