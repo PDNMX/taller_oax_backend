@@ -1,4 +1,4 @@
-const names = ['Juan', 'Benito', 'Pedro', 'Sergio', 'Fernanda', 'Karla', 'Reyna', 'Isela'];
+const names = ['Nancy', 'Benito', 'Pedro', 'Sergio', 'Fernanda', 'Karla', 'Reyna', 'Isela'];
 const last_names = ['Hernandez','Gomez', 'Cruz', 'Perdomo', 'García', 'Mora', 'Morquecho'];
 
 const positions = [
@@ -30,16 +30,64 @@ const positions = [
 
 const entities = [
     {
-        nombre: "",
-        clave: ""
+        nombre: "Secretaría de la Función Pública",
+        clave: "SFP",
+        siglas: "SFP"
     },
     {
-        nombre: "",
-        clave: ""
+        nombre: "Secretaría de Hacienda y Crédito Público",
+        clave: "SHCP",
+        siglas: "SHCP"
     },
     {
-        nombre: "",
-        clave: ""
+        nombre: "Instituto Federal de Telecomunicaciones",
+        clave: "IFT",
+        siglas: "IFT"
+    }
+];
+
+const tipoArea = [
+    {
+        clave: "T",
+        valor: "TÉCNICA"
+    },
+    {
+        clave: "RE",
+        valor: "RESPONSABLE DE LA EJECUCIÓN"
+    }
+];
+
+const procedimientos = [
+    {
+        "clave": 1,
+        "valor": "CONTRATACIONES PÚBLICAS"
+    },
+    {
+        "clave": 2,
+        "valor": "CONCESIONES, LICENCIAS, PERMISOS, AUTORIZACIONES Y PRÓRROGAS"
+    },
+    {
+        "clave": 3,
+        "valor": "ENAJENACIÓN DE BIENES MUEBLES"
+    },
+    {
+        "clave": 4,
+        "valor": "ASIGNACIÓN Y EMISIÓN DE DICTÁMENES DE AVALÚOS NACIONALES"
+    }
+];
+
+const nivelesResponsabilidad = [
+    {
+        "clave": "A",
+        "valor": "ATENCIÓN"
+    },
+    {
+        "clave": "T",
+        "valor": "TRAMITACIÓN"
+    },
+    {
+        "clave": "R",
+        "valor": "RESOLUCIÓN"
     }
 ];
 
@@ -69,6 +117,39 @@ const rfc = person => {
   return `${iniciales}${year}${month}${day}${homoclave}`;
 };
 
+const curp = person => {
+    const {primerApellido, segundoApellido, nombres} = person;
+    let year = getRandomIntInclusive(1970, 1999);
+    let month = getRandomIntInclusive(1, 12);
+    let day = getRandomIntInclusive(1,28);
+
+    if (month < 10){
+        month = '0' + month;
+    }
+
+    if (day < 10){
+        day = '0' + day;
+    }
+
+
+    let consonants1 = primerApellido.toUpperCase();
+    let consonants2 = segundoApellido.toUpperCase();
+    let consonants3 = nombres.toUpperCase();
+    const vowels = ['A','E','I','O','U'];
+    vowels.forEach(v => {
+        consonants1 = consonants1.replace(v, '');
+        consonants2 = consonants2.replace(v, '');
+        consonants3 = consonants3.replace(v, '');
+    });
+
+    const consonants = consonants1[1]+ consonants2[1] + consonants3[1];
+
+    let complemento = randomChoice(["H","M"])+ randomChoice(["VZ","DF", "OX"])+ consonants + getRandomIntInclusive(10, 99);
+    let iniciales = primerApellido.slice(0,2).toUpperCase() + segundoApellido[0].toUpperCase() + nombres[0].toUpperCase() ;
+
+    return `${iniciales}${year}${month}${day}${complemento}`;
+};
+
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
 const getNames = () => randomChoice(names);
 const getLastName = () => randomChoice(last_names);
@@ -80,5 +161,6 @@ module.exports = {
     getPosition,
     getLastName,
     rfc,
+    curp,
     getEntity
 };

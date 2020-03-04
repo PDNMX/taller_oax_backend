@@ -1,6 +1,6 @@
 const {MongoClient} = require('mongodb');
 const {url, client_options} = require('./db_conf');
-const {getNames, getLastName, getPosition, rfc, getEntity} = require('./sample_data');
+const {getNames, getLastName, getPosition, rfc, curp, getEntity} = require('./sample_data');
 
 let nrows = process.argv[2];
 
@@ -31,6 +31,7 @@ MongoClient.connect(url, client_options).then(client => {
 
     data = data.map(d => {
         d.rfc = rfc(d);
+        d.curp = curp(d);
         return d;
     });
 
