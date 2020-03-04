@@ -1,4 +1,6 @@
-# :frog: Oaxaca 2020 backend :mushroom:
+# :frog: Taller Oaxaca 2020 :mushroom:
+Backend de ejemplo para el taller.
+
 ## Instalación de dependencias
 Se requiere contar con una instancia de MongoDB y ejecutar el siguiente comando:
 ```console 
