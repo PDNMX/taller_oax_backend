@@ -88,15 +88,26 @@ router.get('/spic', (req, res) => {
     ];
 
     let _query = {};
+    let _sort = {};
 
     //tipoProcedimiento
-    //sort
 
-    params.forEach( p => {
-        if (query.hasOwnProperty(p) || typeof query[p] === "string") {
-            _query[p] = {$regex: query[p], $options: 'i'};
-        }
-    });
+    if (typeof sort !== 'undefined') {
+        const sortFields = ["nombres", "primerApellido", "segundoApellido", "institucionDependencia", "puesto"];
+        sortFields.forEach(p => {
+            if (sort.hasOwnProperty(p) || typeof sort[p] === 'string') {
+                _sort[p] = sort[p] !== 'asc' ? -1 : 1;
+            }
+        });
+    }
+
+    if (typeof query !== 'undefined') {
+        params.forEach(p => {
+            if (query.hasOwnProperty(p) || typeof query[p] === "string") {
+                _query[p] = {$regex: query[p], $options: 'i'};
+            }
+        });
+    }
 
     console.log(_query);
 
@@ -105,6 +116,10 @@ router.get('/spic', (req, res) => {
         const spic = db.collection('spic');
         let skip = page === 1 ? 0: (page - 1) * pageSize;
         let cursor = spic.find(_query).skip(skip).limit(pageSize);
+
+        if (JSON.stringify(_sort) !== '{}'){
+            cursor.sort(_sort);
+        }
 
         cursor.count().then( totalRows => {
             cursor.toArray().then(data => {
