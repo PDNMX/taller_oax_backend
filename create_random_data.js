@@ -1,6 +1,6 @@
 const {MongoClient} = require('mongodb');
 const {url, client_options} = require('./db_conf');
-const {getNames, getLastName, getPosition, rfc, curp, getEntity} = require('./sample_data');
+const {getNamesGender, getLastName, getPosition, rfc, curp, getEntity} = require('./sample_data');
 
 let nrows = process.argv[2];
 
