@@ -14,13 +14,17 @@ MongoClient.connect(url, client_options).then(client => {
 
     let data = [];
     for (let i = 0; i < nrows; i++){
+
+        const names = getNames();
+
         data.push({
             fechaCaptura: (new Date()).toISOString(),
             rfc: '',
             curp: '',
-            nombres: getNames(),
+            nombres: names.name,
             primerApellido: getLastName(),
             segundoApellido: getLastName(),
+            genero: names.gender,
             institucionDependencia: getEntity(),
             puesto: getPosition(),
             tipoArea: [],

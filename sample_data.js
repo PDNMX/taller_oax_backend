@@ -1,5 +1,38 @@
-const names = ['Nancy', 'Benito', 'Pedro', 'Sergio', 'Fernanda', 'Karla', 'Reyna', 'Isela'];
-const last_names = ['Hernandez','Gomez', 'Cruz', 'Perdomo', 'García', 'Mora', 'Morquecho'];
+const names = [
+    {
+        name: 'Nancy',
+        gender: { clave: 'F', valor: 'FEMENINO' }
+    },
+    {
+        name: 'Fenito',
+        gender: { clave: "M", valor: "MASCULINO"}
+    },
+    {
+        name: 'Pedro',
+        gender: { clave: "M", valor: "MASCULINO" }
+    },
+    {
+        name: 'Mergio',
+        gender: { clave: "M", valor: "MASCULINO" }
+    },
+    {
+        name: 'Fernanda',
+        gender: { clave: 'F', valor: 'FEMENINO' }
+    },
+    {
+        name: 'Karla',
+        gender: { clave: 'F', valor: 'FEMENINO' }
+    },
+    {
+        name: 'Reyna',
+        gender: { clave: 'F', valor: 'FEMENINO' }
+    },
+    {
+        name: 'Ichela',
+        gender: { clave: 'F', valor: 'FEMENINO' }
+    }
+];
+const last_names = ['Hernandez','Gomez', 'Cruz', 'Perdomo', 'García', 'Mora', 'Morquecho', 'Caraveo'];
 
 const positions = [
     {
@@ -118,7 +151,7 @@ const rfc = person => {
 };
 
 const curp = person => {
-    const {primerApellido, segundoApellido, nombres} = person;
+    const {primerApellido, segundoApellido, nombres, genero} = person;
     let year = getRandomIntInclusive(1970, 1999);
     let month = getRandomIntInclusive(1, 12);
     let day = getRandomIntInclusive(1,28);
@@ -130,7 +163,6 @@ const curp = person => {
     if (day < 10){
         day = '0' + day;
     }
-
 
     let consonants1 = primerApellido.toUpperCase();
     let consonants2 = segundoApellido.toUpperCase();
@@ -144,7 +176,9 @@ const curp = person => {
 
     const consonants = consonants1[1]+ consonants2[1] + consonants3[1];
 
-    let complemento = randomChoice(["H","M"])+ randomChoice(["VZ","DF", "OX"])+ consonants + getRandomIntInclusive(10, 99);
+    const sexo = genero.clave === 'F'?'M':'H';
+
+    let complemento = sexo + randomChoice(["VZ","DF", "OX"])+ consonants + getRandomIntInclusive(10, 99);
     let iniciales = primerApellido.slice(0,2).toUpperCase() + segundoApellido[0].toUpperCase() + nombres[0].toUpperCase() ;
 
     return `${iniciales}${year}${month}${day}${complemento}`;
