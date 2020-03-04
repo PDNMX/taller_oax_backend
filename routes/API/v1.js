@@ -1,10 +1,12 @@
 var express = require('express');
 var cors = require('cors');
 var router = express.Router();
-
 router.use(cors());
 
+// MongoDB
 const dbConf = require('../../db_conf');
+const mongoose = require('mongoose');
+const {Spic} = require('../../models');
 const {MongoClient, ObjectId} = require('mongodb');
 
 router.get('/', (req, res) => {
@@ -14,61 +16,52 @@ router.get('/', (req, res) => {
    });
 });
 
+
 // create
 router.post('/spic', (req, res) => {
+    mongoose.connect(dbConf.url, dbConf.client_options);
+    const {body} = req;
+    let new_spic = Spic(body);
 
-    const params = [
-        "ejercicioFiscal", "periodoEjercicio", "rfc", "curp",
-        "nombres", "primerApellido", "segundoApellido",
-        "genero", "institucionDependencia", "puesto", "tipoArea",
-        "nivelResponsabilidad", "tipoProcedimiento" /* , superiorInmediato */
-    ];
-
-    let servidor_publico = {
-        fechaCaptura: (new Date()).toISOString()
-    };
-
-    params.forEach(p => {
-        if (req.body.hasOwnProperty(p)){
-            servidor_publico[p] = req.body[p];
-        }
-    });
-
-    MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
-        const db = client.db();
-        const spic = db.collection('spic');
-        spic.insertOne(servidor_publico).then(data => {
-            //console.log(data);
-            res.json({
-                insertedId: data.insertedId.toString(),
-                ...data.result
-            });
-        });
+    new_spic.fechaCaptura = (new Date()).toISOString();
+    new_spic.save().then(d => {
+        console.log(d);
+        res.json(d);
+        mongoose.disconnect();
+    }).catch(error => {
+        console.log(error);
+        res.status(500).json(error);
+        mongoose.disconnect();
     });
 });
 
 // find and update by id
 router.put('/spic', (req, res) => {
-    const {id} = req.body;
-    MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
-       const db = client.db;
-       const spic = db.collection('spic');
+    const {id, spic} = req.body;
+    mongoose.connect(dbConf.url, dbConf.client_options);
 
-       spic.updateOne()
+    Spic.findByIdAndUpdate(id, spic, {new: true}).then(sp => {
+        res.json(sp);
+        mongoose.disconnect();
+    }).catch(error => {
+        console.log(error);
+        res.status(500).json(error);
+        mongoose.disconnect();
     });
-    res.json({});
 });
 
 // delete by id
 router.delete('/spic', (req, res) => {
     const {id} = req.body;
-    MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
-        const db = client.db();
-        const spic = db.collection('spic');
-        spic.deleteOne({_id: ObjectId(id)}).then(data => {
-            res.json(data.result)
-        });
-    });
+    mongoose.connect(dbConf.url, dbConf.client_options);
+
+    Spic.findByIdAndDelete(id).then(d => {
+        res.json(d);
+        mongoose.disconnect();
+    }).catch(error => {
+        res.status(500).json(error);
+        mongoose.disconnect();
+    })
 });
 
 // find
@@ -112,7 +105,6 @@ router.get('/spic', (req, res) => {
                 res.json({
                     results: data.map(d => {
                         d.id = d._id.toString();
-                        delete(d._id);
                         return d;
                     }),
                     pagination: {

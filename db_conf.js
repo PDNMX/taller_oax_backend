@@ -13,7 +13,8 @@ if (typeof user !== 'undefined') {
 const url = `mongodb://${credentials}${host}:${port}/${dbName}`;
 
 const client_options = {
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useNewUrlParser: true
 };
 
 module.exports = {

@@ -1,4 +1,5 @@
-const {MongoClient} = require('mongodb');
+const mongoose = require('mongoose');
+const {Spic} = require('./models');
 const {url, client_options} = require('./db_conf');
 const {getNamesGender, getLastName, getPosition, rfc, curp, getEntity, getProcedure, getRoles, getArea, randomChoice} = require('./sample_data');
 
@@ -9,55 +10,49 @@ if (typeof nrows === 'undefined' || isNaN(nrows) || nrows < 1){
 }
 
 console.log('nrows -> ', nrows);
+mongoose.connect(url, client_options);
 
-MongoClient.connect(url, client_options).then(client => {
+let data = [];
+for (let i = 0; i < nrows; i++){
 
-    let data = [];
-    for (let i = 0; i < nrows; i++){
+    const ng = getNamesGender();
 
-        const ng = getNamesGender();
-
-        data.push({
-            fechaCaptura: (new Date()).toISOString(),
-            ejercicioFiscal: randomChoice(['2016','2017','2018','2019','2020']),
-            //periodoEjercicio
-            //ramo
-            rfc: '',
-            curp: '',
-            nombres: ng.name,
-            primerApellido: getLastName(),
-            segundoApellido: getLastName(),
-            genero: ng.gender,
-            institucionDependencia: getEntity(),
-            puesto: getPosition(),
-            tipoArea: [
-                getArea()
-            ],
-            nivelResponsabilidad: [
-                getRoles()
-            ],
-            tipoProcedimiento: [
-                getProcedure()
-            ]
-            //superiorInmediato
-        });
-    }
-
-    data = data.map(d => {
-        d.rfc = rfc(d);
-        d.curp = curp(d);
-        return d;
+    data.push({
+        fechaCaptura: (new Date()).toISOString(),
+        ejercicioFiscal: randomChoice(['2016','2017','2018','2019','2020']),
+        //periodoEjercicio
+        //ramo
+        rfc: '',
+        curp: '',
+        nombres: ng.name,
+        primerApellido: getLastName(),
+        segundoApellido: getLastName(),
+        genero: ng.gender,
+        institucionDependencia: getEntity(),
+        puesto: getPosition(),
+        tipoArea: [
+            getArea()
+        ],
+        tipoProcedimiento: [
+            getProcedure()
+        ],
+        nivelResponsabilidad: [
+            getRoles()
+        ]
+        //superiorInmediato
     });
+}
 
-    const db = client.db();
-    const collection = db.collection('spic');
+data = data.map(d => {
+    d.rfc = rfc(d);
+    d.curp = curp(d);
+    return d;
+});
 
-    collection.insertMany(data).then(insertResult => {
-       console.log(insertResult);
-        client.close();
-    }).catch(error => {
-        console.log(error);
-        client.close();
-    });
-
+Spic.insertMany(data).then(d =>{
+    console.log(d);
+    mongoose.disconnect();
+}).catch(error => {
+    console.log(error);
+    mongoose.disconnect();
 });
