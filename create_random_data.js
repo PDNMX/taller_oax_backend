@@ -1,6 +1,6 @@
 const {MongoClient} = require('mongodb');
 const {url, client_options} = require('./db_conf');
-const {getNames, getLastName, getPosition, rfc} = require('./sample_data');
+const {getNames, getLastName, getPosition, rfc, getEntity} = require('./sample_data');
 
 let nrows = process.argv[2];
 
@@ -15,12 +15,17 @@ MongoClient.connect(url, client_options).then(client => {
     let data = [];
     for (let i = 0; i < nrows; i++){
         data.push({
+            fechaCaptura: (new Date()).toISOString(),
+            rfc: '',
+            curp: '',
             nombres: getNames(),
             primerApellido: getLastName(),
             segundoApellido: getLastName(),
-            rfc: '',
-            curp: '',
+            institucionDependencia: getEntity(),
             puesto: getPosition(),
+            tipoArea: [],
+            nivelResponsabilidad: [],
+            tipoProcedimiento: []
         });
     }
 

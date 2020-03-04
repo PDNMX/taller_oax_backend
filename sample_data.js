@@ -1,43 +1,53 @@
 const names = ['Juan', 'Benito', 'Pedro', 'Sergio', 'Fernanda', 'Karla', 'Reyna', 'Isela'];
 const last_names = ['Hernandez','Gomez', 'Cruz', 'Perdomo', 'García', 'Mora', 'Morquecho'];
+
 const positions = [
     {
         nombre: 'Director',
-        clave: 'M32'
+        nivel: 'M32'
     },
     {
         nombre: 'Jefe de departamento',
-        clave: 'O21'
+        nivel: 'O21'
     },
     {
         nombre: 'Titular de Unidad',
-        clave: 'J31'
+        nivel: 'J31'
     },
     {
         nombre: 'Director General',
-        clave: 'K31'
+        nivel: 'K31'
     },
     {
         nombre: 'Subdirector',
-        clave: 'N31'
+        nivel: 'N31'
     },
     {
         nombre: 'Director General Adjunto',
-        clave: 'L31'
+        nivel: 'L31'
     }
 ];
 
-const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
+const entities = [
+    {
+        nombre: "",
+        clave: ""
+    },
+    {
+        nombre: "",
+        clave: ""
+    },
+    {
+        nombre: "",
+        clave: ""
+    }
+];
 
 const getRandomIntInclusive = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
 };
-
-const getNames = () => randomChoice(names);
-const getLastName = () => randomChoice(last_names);
-const getPosition = () => randomChoice(positions);
 
 const rfc = person => {
     const {primerApellido, segundoApellido, nombres} = person;
@@ -59,9 +69,16 @@ const rfc = person => {
   return `${iniciales}${year}${month}${day}${homoclave}`;
 };
 
+const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
+const getNames = () => randomChoice(names);
+const getLastName = () => randomChoice(last_names);
+const getPosition = () => randomChoice(positions);
+const getEntity = () => randomChoice(entities);
+
 module.exports = {
     getNames,
     getPosition,
     getLastName,
-    rfc
+    rfc,
+    getEntity
 };

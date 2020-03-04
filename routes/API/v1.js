@@ -22,7 +22,7 @@ router.post('/spic', (req, res) => {
     ];
 
     let servidor_publico = {
-        fechaCreacion: (new Date()).toISOString()
+        fechaCaptura: (new Date()).toISOString()
     };
 
     params.forEach(p => {
