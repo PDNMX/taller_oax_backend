@@ -2,7 +2,12 @@
 Backend de ejemplo para el taller.
 
 ## Instalación de dependencias
-Se requiere contar con una instancia de MongoDB y ejecutar el siguiente comando:
+La instalación de las dependencias de software requiere de la instalación de:
+- [MongoDB](https://www.mongodb.com/)
+- [Nodejs](https://nodejs.org/es/) 
+- [yarn](https://yarnpkg.com/) 
+
+La instalación se inicia con la ejecuión del siguiente comando:
 ```console 
 yarn install
 ```
