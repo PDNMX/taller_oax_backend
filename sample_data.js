@@ -45,6 +45,14 @@ const rfc = person => {
     let month = getRandomIntInclusive(1, 12);
     let day = getRandomIntInclusive(1,28);
 
+    if (month < 10){
+        month = '0' + month;
+    }
+
+    if (day < 10){
+        day = '0' + day;
+    }
+
     let homoclave = randomChoice(["A","B","C","D","E"]) + getRandomIntInclusive(10, 99);
     let iniciales = primerApellido.slice(0,2).toUpperCase() + segundoApellido[0].toUpperCase() + nombres[0].toUpperCase() ;
 

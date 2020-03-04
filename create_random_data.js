@@ -18,6 +18,8 @@ MongoClient.connect(url, client_options).then(client => {
             nombres: getNames(),
             primerApellido: getLastName(),
             segundoApellido: getLastName(),
+            rfc: '',
+            curp: '',
             puesto: getPosition(),
         });
     }
