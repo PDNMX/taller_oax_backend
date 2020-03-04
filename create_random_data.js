@@ -1,6 +1,6 @@
 const {MongoClient} = require('mongodb');
 const {url, client_options} = require('./db_conf');
-const {getNamesGender, getLastName, getPosition, rfc, curp, getEntity} = require('./sample_data');
+const {getNamesGender, getLastName, getPosition, rfc, curp, getEntity, getProcedure, getRoles, getArea, randomChoice} = require('./sample_data');
 
 let nrows = process.argv[2];
 
@@ -19,17 +19,27 @@ MongoClient.connect(url, client_options).then(client => {
 
         data.push({
             fechaCaptura: (new Date()).toISOString(),
+            ejercicioFiscal: randomChoice(['2016','2017','2018','2019','2020']),
+            //periodoEjercicio
+            //ramo
             rfc: '',
             curp: '',
-            nombres: ng.names,
+            nombres: ng.name,
             primerApellido: getLastName(),
             segundoApellido: getLastName(),
             genero: ng.gender,
             institucionDependencia: getEntity(),
             puesto: getPosition(),
-            tipoArea: [],
-            nivelResponsabilidad: [],
-            tipoProcedimiento: []
+            tipoArea: [
+                getArea()
+            ],
+            nivelResponsabilidad: [
+                getRoles()
+            ],
+            tipoProcedimiento: [
+                getProcedure()
+            ]
+            //superiorInmediato
         });
     }
 

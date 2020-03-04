@@ -30,9 +30,14 @@ const names = [
     {
         name: 'Ichela',
         gender: { clave: 'F', valor: 'FEMENINO' }
+    },
+    {
+        name: 'Hugo',
+        gender: { clave: 'O', valor: 'OTRO' }
     }
 ];
-const last_names = ['Hernandez','Gomez', 'Cruz', 'Perdomo', 'García', 'Mora', 'Morquecho', 'Caraveo'];
+
+const last_names = ['Hernandez','Gomez', 'Cruz', 'Perdomo', 'García', 'Mora', 'Morquecho', 'Caraveo', 'Villarreal', 'Rodriguez', 'Rivera'];
 
 const positions = [
     {
@@ -87,6 +92,22 @@ const tipoArea = [
     {
         clave: "RE",
         valor: "RESPONSABLE DE LA EJECUCIÓN"
+    },
+    {
+        clave: "RC",
+        valor: "RESPONSABLE DE LA CONTRATACIÓN"
+    },
+    {
+        clave: "O",
+        valor: "OTRA"
+    },
+    {
+        clave: "C",
+        valor: "CONTRATANTE"
+    },
+    {
+        clave: "R",
+        valor: "REQUIRENTE"
     }
 ];
 
@@ -109,7 +130,7 @@ const procedimientos = [
     }
 ];
 
-const nivelesResponsabilidad = [
+const responsabilidades = [
     {
         "clave": "A",
         "valor": "ATENCIÓN"
@@ -132,7 +153,7 @@ const getRandomIntInclusive = (min, max) => {
 
 const rfc = person => {
     const {primerApellido, segundoApellido, nombres} = person;
-    let year = getRandomIntInclusive(1970, 1999);
+    let year = getRandomIntInclusive(70, 99);
     let month = getRandomIntInclusive(1, 12);
     let day = getRandomIntInclusive(1,28);
 
@@ -152,7 +173,7 @@ const rfc = person => {
 
 const curp = person => {
     const {primerApellido, segundoApellido, nombres, genero} = person;
-    let year = getRandomIntInclusive(1970, 1999);
+    let year = getRandomIntInclusive(70, 99);
     let month = getRandomIntInclusive(1, 12);
     let day = getRandomIntInclusive(1,28);
 
@@ -189,12 +210,19 @@ const getNamesGender = () => randomChoice(names);
 const getLastName = () => randomChoice(last_names);
 const getPosition = () => randomChoice(positions);
 const getEntity = () => randomChoice(entities);
+const getProcedure = () => randomChoice(procedimientos);
+const getRoles = () => randomChoice(responsabilidades);
+const getArea = () => randomChoice(tipoArea);
 
 module.exports = {
+    randomChoice,
     getNamesGender,
     getPosition,
     getLastName,
     rfc,
     curp,
-    getEntity
+    getEntity,
+    getProcedure,
+    getRoles,
+    getArea
 };
