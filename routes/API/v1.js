@@ -93,7 +93,7 @@ router.get('/spic', (req, res) => {
     //sort
 
     params.forEach( p => {
-        if (query.hasOwnProperty(p)) {
+        if (query.hasOwnProperty(p) || typeof query[p] === "string") {
             _query[p] = {$regex: query[p], $options: 'i'};
         }
     });
