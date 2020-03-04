@@ -15,16 +15,16 @@ MongoClient.connect(url, client_options).then(client => {
     let data = [];
     for (let i = 0; i < nrows; i++){
 
-        const names = getNames();
+        const ng = getNamesGender();
 
         data.push({
             fechaCaptura: (new Date()).toISOString(),
             rfc: '',
             curp: '',
-            nombres: names.name,
+            nombres: ng.names,
             primerApellido: getLastName(),
             segundoApellido: getLastName(),
-            genero: names.gender,
+            genero: ng.gender,
             institucionDependencia: getEntity(),
             puesto: getPosition(),
             tipoArea: [],

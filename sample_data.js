@@ -185,13 +185,13 @@ const curp = person => {
 };
 
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
-const getNames = () => randomChoice(names);
+const getNamesGender = () => randomChoice(names);
 const getLastName = () => randomChoice(last_names);
 const getPosition = () => randomChoice(positions);
 const getEntity = () => randomChoice(entities);
 
 module.exports = {
-    getNames,
+    getNamesGender,
     getPosition,
     getLastName,
     rfc,
