@@ -4,7 +4,7 @@ Backend de ejemplo para el taller.
 ## Instalación de dependencias
 La instalación de las dependencias de software requiere de la instalación de:
 - [MongoDB](https://www.mongodb.com/)
-- [Nodejs](https://nodejs.org/es/) 
+- [Node.js](https://nodejs.org/es/) 
 - [yarn](https://yarnpkg.com/) 
 
 La instalación se inicia con la ejecuión del siguiente comando:
@@ -25,6 +25,7 @@ MONGODB_HOST=localhost
 MONGODB_PORT=27017
 MONGODB_USER=oaxaca
 MONGODB_PASSWORD=tlayuda
+MONGODB_DBNAME=oaxaca
 ```
 
 ## Generar datos de prueba
