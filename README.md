@@ -20,7 +20,10 @@ nano .env
 ```
 
 ```env
+# Puerto HTTP
 PORT=3000
+
+# Configuración de MongoDB
 MONGODB_HOST=localhost
 MONGODB_PORT=27017
 MONGODB_USER=oaxaca
