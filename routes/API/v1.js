@@ -90,8 +90,6 @@ router.get('/spic', (req, res) => {
     let _query = {};
     let _sort = {};
 
-    //tipoProcedimiento
-
     if (typeof sort !== 'undefined') {
         const sortFields = ["nombres", "primerApellido", "segundoApellido", "institucionDependencia", "puesto"];
         sortFields.forEach(p => {
@@ -107,6 +105,16 @@ router.get('/spic', (req, res) => {
                 _query[p] = {$regex: query[p], $options: 'i'};
             }
         });
+
+        if (query.hasOwnProperty('tipoProcedimiento') && Array.isArray(query.tipoProcedimiento) && query.tipoProcedimiento.length > 0){
+            let or = [];
+
+            query.tipoProcedimiento.forEach(tp => {
+                or.push({ tipoProcedimiento: {$elemMatch:{ clave: tp }} })
+            });
+
+            _query.$or = or
+        }
     }
 
     console.log(_query);
