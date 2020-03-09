@@ -50,7 +50,7 @@ router.put('/spic', (req, res) => {
     });
 });
 
-// find by id abd delete
+// find by id and delete
 router.delete('/spic', (req, res) => {
     const {id} = req.body;
     mongoose.connect(dbConf.url, dbConf.client_options);
@@ -122,7 +122,7 @@ router.get('/spic', (req, res) => {
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
         const db = client.db();
         const spic = db.collection('spic');
-        let skip = page === 1 ? 0: (page - 1) * pageSize;
+        const skip = page === 1 ? 0: (page - 1) * pageSize;
         let cursor = spic.find(_query).skip(skip).limit(pageSize);
 
         if (JSON.stringify(_sort) !== '{}'){
