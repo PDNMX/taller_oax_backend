@@ -10,15 +10,15 @@ const {Spic} = require('../../models');
 const {MongoClient} = require('mongodb');
 
 router.get('/', (req, res) => {
-   res.json({
-       api_version: 1.0,
-       message: "API SLA"
-   });
+    res.json({
+        api_version: 1.0,
+        message: "API SLA"
+    });
 });
 
 
 // create
-router.post('/spic', (req, res) => {
+router.post('/spic/create', (req, res) => {
     mongoose.connect(dbConf.url, dbConf.client_options);
     const {body} = req;
     let new_spic = Spic(body);
@@ -75,11 +75,11 @@ router.get('/spic', (req, res) => {
         query
     } = body;
 
-    if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1 || pageSize > 200){
+    if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1 || pageSize > 200) {
         pageSize = 10
     }
 
-    if (typeof page === 'undefined' || isNaN(page) || page < 1){
+    if (typeof page === 'undefined' || isNaN(page) || page < 1) {
         page = 1;
     }
 
@@ -106,11 +106,11 @@ router.get('/spic', (req, res) => {
             }
         });
 
-        if (query.hasOwnProperty('tipoProcedimiento') && Array.isArray(query.tipoProcedimiento) && query.tipoProcedimiento.length > 0){
+        if (query.hasOwnProperty('tipoProcedimiento') && Array.isArray(query.tipoProcedimiento) && query.tipoProcedimiento.length > 0) {
             let or = [];
 
             query.tipoProcedimiento.forEach(tp => {
-                or.push({ tipoProcedimiento: {$elemMatch:{ clave: tp }} })
+                or.push({tipoProcedimiento: {$elemMatch: {clave: tp}}})
             });
 
             _query.$or = or
@@ -122,14 +122,14 @@ router.get('/spic', (req, res) => {
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
         const db = client.db();
         const spic = db.collection('spic');
-        const skip = page === 1 ? 0: (page - 1) * pageSize;
+        const skip = page === 1 ? 0 : (page - 1) * pageSize;
         let cursor = spic.find(_query).skip(skip).limit(pageSize);
 
-        if (JSON.stringify(_sort) !== '{}'){
+        if (JSON.stringify(_sort) !== '{}') {
             cursor.sort(_sort);
         }
 
-        cursor.count().then( totalRows => {
+        cursor.count().then(totalRows => {
             cursor.toArray().then(data => {
                 //console.log(data);
                 res.json({
@@ -148,4 +148,89 @@ router.get('/spic', (req, res) => {
     });
 });
 
+// api
+router.post('/spic', (req, res) => {
+    const {body} = req;
+
+    let {
+        page,
+        pageSize,
+        sort,
+        query
+    } = body;
+
+    if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1 || pageSize > 200) {
+        pageSize = 10
+    }
+
+    if (typeof page === 'undefined' || isNaN(page) || page < 1) {
+        page = 1;
+    }
+
+    const params = [
+        "nombres", "primerApellido", "segundoApellido", "curp", "rfc", "institucionDependencia"
+    ];
+
+    let _query = {};
+    let _sort = {};
+
+    if (typeof sort !== 'undefined') {
+        const sortFields = ["nombres", "primerApellido", "segundoApellido", "institucionDependencia", "puesto"];
+        sortFields.forEach(p => {
+            if (sort.hasOwnProperty(p) || typeof sort[p] === 'string') {
+                _sort[p] = sort[p] !== 'asc' ? -1 : 1;
+            }
+        });
+    }
+
+    if (typeof query !== 'undefined') {
+        params.forEach(p => {
+            if (query.hasOwnProperty(p) || typeof query[p] === "string") {
+                _query[p] = {$regex: query[p], $options: 'i'};
+            }
+        });
+
+        if (query.hasOwnProperty('tipoProcedimiento') && Array.isArray(query.tipoProcedimiento) && query.tipoProcedimiento.length > 0) {
+            let or = [];
+
+            query.tipoProcedimiento.forEach(tp => {
+                or.push({tipoProcedimiento: {$elemMatch: {clave: tp}}})
+            });
+
+            _query.$or = or
+        }
+    }
+
+    console.log(_query);
+
+    MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
+        const db = client.db();
+        const spic = db.collection('spic');
+        const skip = page === 1 ? 0 : (page - 1) * pageSize;
+        let cursor = spic.find(_query).skip(skip).limit(pageSize);
+
+        if (JSON.stringify(_sort) !== '{}') {
+            cursor.sort(_sort);
+        }
+
+        cursor.count().then(totalRows => {
+            cursor.toArray().then(data => {
+                //console.log(data);
+                let tR = Math.ceil(totalRows/pageSize)>page;
+                res.json({
+                    pagination: {
+                        pageSize: pageSize,
+                        page: page,
+                        totalRows: totalRows,
+                        hasNextPage: tR
+                    },
+                    results: data.map(d => {
+                        d.id = d._id.toString();
+                        return d;
+                    })
+                });
+            });
+        });
+    });
+});
 module.exports = router;
