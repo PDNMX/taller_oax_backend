@@ -5,7 +5,7 @@ const names = [
     },
     {
         name: 'Fenito',
-        gender: { clave: "M", valor: "MASCULINO"}
+        gender: { clave: "M", valor: "MASCULINO" }
     },
     {
         name: 'Pedro',
@@ -37,7 +37,7 @@ const names = [
     }
 ];
 
-const last_names = ['Hernandez','Gomez', 'Cruz', 'Perdomo', 'García', 'Mora', 'Morquecho', 'Caraveo', 'Villarreal', 'Rodriguez', 'Rivera'];
+const last_names = ['Hernandez', 'Gomez', 'Cruz', 'Perdomo', 'García', 'Mora', 'Morquecho', 'Caraveo', 'Villarreal', 'Rodriguez', 'Rivera'];
 
 const positions = [
     {
@@ -111,38 +111,48 @@ const tipoArea = [
     }
 ];
 
+// const procedimientos = [
+//     {
+//         "clave": 1,
+//         "valor": "CONTRATACIONES PÚBLICAS"
+//     },
+//     {
+//         "clave": 2,
+//         "valor": "CONCESIONES, LICENCIAS, PERMISOS, AUTORIZACIONES Y PRÓRROGAS"
+//     },
+//     {
+//         "clave": 3,
+//         "valor": "ENAJENACIÓN DE BIENES MUEBLES"
+//     },
+//     {
+//         "clave": 4,
+//         "valor": "ASIGNACIÓN Y EMISIÓN DE DICTÁMENES DE AVALÚOS NACIONALES"
+//     }
+// ];
+
 const procedimientos = [
-    {
-        "clave": 1,
-        "valor": "CONTRATACIONES PÚBLICAS"
-    },
-    {
-        "clave": 2,
-        "valor": "CONCESIONES, LICENCIAS, PERMISOS, AUTORIZACIONES Y PRÓRROGAS"
-    },
-    {
-        "clave": 3,
-        "valor": "ENAJENACIÓN DE BIENES MUEBLES"
-    },
-    {
-        "clave": 4,
-        "valor": "ASIGNACIÓN Y EMISIÓN DE DICTÁMENES DE AVALÚOS NACIONALES"
-    }
+    1, 2, 3, 4
 ];
 
+// const responsabilidades = [
+//     {
+//         "clave": "A",
+//         "valor": "ATENCIÓN"
+//     },
+//     {
+//         "clave": "T",
+//         "valor": "TRAMITACIÓN"
+//     },
+//     {
+//         "clave": "R",
+//         "valor": "RESOLUCIÓN"
+//     }
+// ];
+
 const responsabilidades = [
-    {
-        "clave": "A",
-        "valor": "ATENCIÓN"
-    },
-    {
-        "clave": "T",
-        "valor": "TRAMITACIÓN"
-    },
-    {
-        "clave": "R",
-        "valor": "RESOLUCIÓN"
-    }
+    "A",
+    "T",
+    "R",
 ];
 
 const getRandomIntInclusive = (min, max) => {
@@ -152,55 +162,55 @@ const getRandomIntInclusive = (min, max) => {
 };
 
 const rfc = person => {
-    const {primerApellido, segundoApellido, nombres} = person;
+    const { primerApellido, segundoApellido, nombres } = person;
     let year = getRandomIntInclusive(70, 99);
     let month = getRandomIntInclusive(1, 12);
-    let day = getRandomIntInclusive(1,28);
+    let day = getRandomIntInclusive(1, 28);
 
-    if (month < 10){
+    if (month < 10) {
         month = '0' + month;
     }
 
-    if (day < 10){
+    if (day < 10) {
         day = '0' + day;
     }
 
-    let homoclave = randomChoice(["A","B","C","D","E"]) + getRandomIntInclusive(10, 99);
-    let iniciales = primerApellido.slice(0,2).toUpperCase() + segundoApellido[0].toUpperCase() + nombres[0].toUpperCase() ;
+    let homoclave = randomChoice(["A", "B", "C", "D", "E"]) + getRandomIntInclusive(10, 99);
+    let iniciales = primerApellido.slice(0, 2).toUpperCase() + segundoApellido[0].toUpperCase() + nombres[0].toUpperCase();
 
-  return `${iniciales}${year}${month}${day}${homoclave}`;
+    return `${iniciales}${year}${month}${day}${homoclave}`;
 };
 
 const curp = person => {
-    const {primerApellido, segundoApellido, nombres, genero} = person;
+    const { primerApellido, segundoApellido, nombres, genero } = person;
     let year = getRandomIntInclusive(70, 99);
     let month = getRandomIntInclusive(1, 12);
-    let day = getRandomIntInclusive(1,28);
+    let day = getRandomIntInclusive(1, 28);
 
-    if (month < 10){
+    if (month < 10) {
         month = '0' + month;
     }
 
-    if (day < 10){
+    if (day < 10) {
         day = '0' + day;
     }
 
     let consonants1 = primerApellido.toUpperCase();
     let consonants2 = segundoApellido.toUpperCase();
     let consonants3 = nombres.toUpperCase();
-    const vowels = ['A','E','I','O','U'];
+    const vowels = ['A', 'E', 'I', 'O', 'U'];
     vowels.forEach(v => {
         consonants1 = consonants1.replace(v, '');
         consonants2 = consonants2.replace(v, '');
         consonants3 = consonants3.replace(v, '');
     });
 
-    const consonants = consonants1[1]+ consonants2[1] + consonants3[1];
+    const consonants = consonants1[1] + consonants2[1] + consonants3[1];
 
-    const sexo = genero.clave === 'F'?'M':'H';
+    const sexo = genero.clave === 'F' ? 'M' : 'H';
 
-    let complemento = sexo + randomChoice(["VZ","DF", "OX"])+ consonants + getRandomIntInclusive(10, 99);
-    let iniciales = primerApellido.slice(0,2).toUpperCase() + segundoApellido[0].toUpperCase() + nombres[0].toUpperCase() ;
+    let complemento = sexo + randomChoice(["VZ", "DF", "OX"]) + consonants + getRandomIntInclusive(10, 99);
+    let iniciales = primerApellido.slice(0, 2).toUpperCase() + segundoApellido[0].toUpperCase() + nombres[0].toUpperCase();
 
     return `${iniciales}${year}${month}${day}${complemento}`;
 };
