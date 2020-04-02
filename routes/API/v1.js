@@ -65,99 +65,99 @@ router.delete('/spic', (req, res) => {
 });
 
 // find
-router.get('/spic', (req, res) => {
-    const { body } = req;
+// router.get('/spic', (req, res) => {
+//     const { body } = req;
 
-    let {
-        page,
-        pageSize,
-        sort,
-        query
-    } = body;
+//     let {
+//         page,
+//         pageSize,
+//         sort,
+//         query
+//     } = body;
 
-    if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1 || pageSize > 200) {
-        pageSize = 10
-    }
+//     if (typeof pageSize === 'undefined' || isNaN(pageSize) || pageSize < 1 || pageSize > 200) {
+//         pageSize = 10
+//     }
 
-    if (typeof page === 'undefined' || isNaN(page) || page < 1) {
-        page = 1;
-    }
+//     if (typeof page === 'undefined' || isNaN(page) || page < 1) {
+//         page = 1;
+//     }
 
-    const params = [
-        "nombres", "primerApellido", "segundoApellido", "curp", "rfc", "institucionDependencia"
-    ];
+//     const params = [
+//         "nombres", "primerApellido", "segundoApellido", "curp", "rfc", "institucionDependencia"
+//     ];
 
-    let _query = {};
-    let _sort = {};
+//     let _query = {};
+//     let _sort = {};
 
-    if (typeof sort !== 'undefined') {
-        const sortFields = ["nombres", "primerApellido", "segundoApellido", "institucionDependencia", "puesto"];
-        sortFields.forEach(p => {
-            if (sort.hasOwnProperty(p) || typeof sort[p] === 'string') {
-                _sort[p] = sort[p] !== 'asc' ? -1 : 1;
-            }
-        });
-    }
+//     if (typeof sort !== 'undefined') {
+//         const sortFields = ["nombres", "primerApellido", "segundoApellido", "institucionDependencia", "puesto"];
+//         sortFields.forEach(p => {
+//             if (sort.hasOwnProperty(p) || typeof sort[p] === 'string') {
+//                 _sort[p] = sort[p] !== 'asc' ? -1 : 1;
+//             }
+//         });
+//     }
 
-    if (typeof query !== 'undefined') {
-        params.forEach(p => {
-            if (query.hasOwnProperty(p) || typeof query[p] === "string") {
-                _query[p] = { $regex: query[p], $options: 'i' };
-            }
-        });
+//     if (typeof query !== 'undefined') {
+//         params.forEach(p => {
+//             if (query.hasOwnProperty(p) || typeof query[p] === "string") {
+//                 _query[p] = { $regex: query[p], $options: 'i' };
+//             }
+//         });
 
-        if (query.hasOwnProperty('tipoProcedimiento') && Array.isArray(query.tipoProcedimiento) && query.tipoProcedimiento.length > 0) {
-            let or = [];
+//         if (query.hasOwnProperty('tipoProcedimiento') && Array.isArray(query.tipoProcedimiento) && query.tipoProcedimiento.length > 0) {
+//             let or = [];
 
-            query.tipoProcedimiento.forEach(tp => {
-                or.push({ tipoProcedimiento: { $elemMatch: { clave: tp } } })
-            });
+//             query.tipoProcedimiento.forEach(tp => {
+//                 or.push({ tipoProcedimiento: { $elemMatch: { clave: tp } } })
+//             });
 
-            _query.$or = or
-        }
-    }
+//             _query.$or = or
+//         }
+//     }
 
-    console.log(_query);
+//     console.log(_query);
 
-    MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
-        const db = client.db();
-        const spic = db.collection('spic');
-        const skip = page === 1 ? 0 : (page - 1) * pageSize;
-        let cursor = spic.find(_query).skip(skip).limit(pageSize);
+//     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
+//         const db = client.db();
+//         const spic = db.collection('spic');
+//         const skip = page === 1 ? 0 : (page - 1) * pageSize;
+//         let cursor = spic.find(_query).skip(skip).limit(pageSize);
 
-        if (JSON.stringify(_sort) !== '{}') {
-            cursor.sort(_sort);
-        }
+//         if (JSON.stringify(_sort) !== '{}') {
+//             cursor.sort(_sort);
+//         }
 
-        cursor.count().then(totalRows => {
-            cursor.toArray().then(data => {
-                let hasNextPage = (page * pageSize) < totalRows;
-                res.json({
-                    pagination: {
-                        page: page,
-                        pageSize: pageSize,
-                        totalRows: totalRows,
-                        hasNextPage: hasNextPage
-                    },
-                    results: data.map(d => {
-                        let id = d._id.toString();
-                        delete d._id;
-                        return { id: id, ...d };
-                    })
+//         cursor.count().then(totalRows => {
+//             cursor.toArray().then(data => {
+//                 let hasNextPage = (page * pageSize) < totalRows;
+//                 res.json({
+//                     pagination: {
+//                         page: page,
+//                         pageSize: pageSize,
+//                         totalRows: totalRows,
+//                         hasNextPage: hasNextPage
+//                     },
+//                     results: data.map(d => {
+//                         let id = d._id.toString();
+//                         delete d._id;
+//                         return { id: id, ...d };
+//                     })
 
-                });
-            });
-        });
-    }).catch(err => {
-        res.json({
-            code: "021",
-            message: "fail database"
-        })
-        console.log(err);
-    });
-});
+//                 });
+//             });
+//         });
+//     }).catch(err => {
+//         res.json({
+//             code: "021",
+//             message: "fail database"
+//         })
+//         console.log(err);
+//     });
+// });
 
-
+//lista de dependencias
 router.get('/spic/dependencias', (req, res) => {
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
         const db = client.db();
@@ -189,7 +189,8 @@ router.get('/spic/dependencias', (req, res) => {
         console.log(err);
     });
 });
-// api
+
+// api consulta
 router.post('/spic', (req, res) => {
     const { body } = req;
 
