@@ -6,8 +6,8 @@ router.use(cors());
 // MongoDB
 const dbConf = require('../../db_conf');
 const mongoose = require('mongoose');
-const {Spic} = require('../../models');
-const {MongoClient} = require('mongodb');
+const { Spic } = require('../../models');
+const { MongoClient, ObjectID } = require('mongodb');
 
 router.get('/', (req, res) => {
     res.json({
@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
 // create
 router.post('/spic/create', (req, res) => {
     mongoose.connect(dbConf.url, dbConf.client_options);
-    const {body} = req;
+    const { body } = req;
     let new_spic = Spic(body);
 
     new_spic.fechaCaptura = (new Date()).toISOString();
@@ -37,10 +37,10 @@ router.post('/spic/create', (req, res) => {
 
 // find by id and update
 router.put('/spic', (req, res) => {
-    const {id, spic} = req.body;
+    const { id, spic } = req.body;
     mongoose.connect(dbConf.url, dbConf.client_options);
 
-    Spic.findByIdAndUpdate(id, spic, {new: true}).then(sp => {
+    Spic.findByIdAndUpdate(id, spic, { new: true }).then(sp => {
         res.json(sp);
         mongoose.disconnect();
     }).catch(error => {
@@ -52,7 +52,7 @@ router.put('/spic', (req, res) => {
 
 // find by id and delete
 router.delete('/spic', (req, res) => {
-    const {id} = req.body;
+    const { id } = req.body;
     mongoose.connect(dbConf.url, dbConf.client_options);
 
     Spic.findByIdAndDelete(id).then(d => {
@@ -66,7 +66,7 @@ router.delete('/spic', (req, res) => {
 
 // find
 router.get('/spic', (req, res) => {
-    const {body} = req;
+    const { body } = req;
 
     let {
         page,
@@ -102,7 +102,7 @@ router.get('/spic', (req, res) => {
     if (typeof query !== 'undefined') {
         params.forEach(p => {
             if (query.hasOwnProperty(p) || typeof query[p] === "string") {
-                _query[p] = {$regex: query[p], $options: 'i'};
+                _query[p] = { $regex: query[p], $options: 'i' };
             }
         });
 
@@ -110,7 +110,7 @@ router.get('/spic', (req, res) => {
             let or = [];
 
             query.tipoProcedimiento.forEach(tp => {
-                or.push({tipoProcedimiento: {$elemMatch: {clave: tp}}})
+                or.push({ tipoProcedimiento: { $elemMatch: { clave: tp } } })
             });
 
             _query.$or = or
@@ -131,26 +131,67 @@ router.get('/spic', (req, res) => {
 
         cursor.count().then(totalRows => {
             cursor.toArray().then(data => {
-                //console.log(data);
+                let hasNextPage = (page * pageSize) < totalRows;
                 res.json({
-                    results: data.map(d => {
-                        d.id = d._id.toString();
-                        return d;
-                    }),
                     pagination: {
                         page: page,
                         pageSize: pageSize,
-                        totalRows: totalRows
-                    }
+                        totalRows: totalRows,
+                        hasNextPage: hasNextPage
+                    },
+                    results: data.map(d => {
+                        let id = d._id.toString();
+                        delete d._id;
+                        return { id: id, ...d };
+                    })
+
                 });
             });
         });
+    }).catch(err => {
+        res.json({
+            code: "021",
+            message: "fail database"
+        })
+        console.log(err);
     });
 });
 
+
+router.get('/spic/dependencias', (req, res) => {
+    MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
+        const db = client.db();
+        const spic = db.collection('spic');
+
+
+        spic.aggregate([
+            { $group: { _id: { nombre: "$institucionDependencia.nombre", siglas: "$institucionDependencia.siglas", clave: "$institucionDependencia.clave" } } }
+        ]).toArray(function (err, docs) {
+            if (err) {
+                res.json({
+                    code: "022",
+                    message: "fail group"
+                })
+            }
+
+            res.json(
+                docs.map(d => {
+                    return d._id;
+                })
+            )
+        });
+
+    }).catch(err => {
+        res.json({
+            code: "021",
+            message: "fail database"
+        })
+        console.log(err);
+    });
+});
 // api
 router.post('/spic', (req, res) => {
-    const {body} = req;
+    const { body } = req;
 
     let {
         page,
@@ -168,14 +209,14 @@ router.post('/spic', (req, res) => {
     }
 
     const params = [
-        "nombres", "primerApellido", "segundoApellido", "curp", "rfc", "institucionDependencia"
+        "nombres", "primerApellido", "segundoApellido", "curp", "rfc"
     ];
 
     let _query = {};
     let _sort = {};
 
     if (typeof sort !== 'undefined') {
-        const sortFields = ["nombres", "primerApellido", "segundoApellido", "institucionDependencia", "puesto"];
+        const sortFields = ["nombres", "primerApellido", "segundoApellido", "puesto", "institucionDependencia"];
         sortFields.forEach(p => {
             if (sort.hasOwnProperty(p) || typeof sort[p] === 'string') {
                 _sort[p] = sort[p] !== 'asc' ? -1 : 1;
@@ -186,7 +227,7 @@ router.post('/spic', (req, res) => {
     if (typeof query !== 'undefined') {
         params.forEach(p => {
             if (query.hasOwnProperty(p) || typeof query[p] === "string") {
-                _query[p] = {$regex: query[p], $options: 'i'};
+                _query[p] = { $regex: query[p], $options: 'i' };
             }
         });
 
@@ -194,20 +235,29 @@ router.post('/spic', (req, res) => {
             let or = [];
 
             query.tipoProcedimiento.forEach(tp => {
-                or.push({tipoProcedimiento: {$elemMatch: {clave: tp}}})
+                or.push({ tipoProcedimiento: { $elemMatch: { clave: tp } } })
             });
 
             _query.$or = or
         }
+
+        if (query.hasOwnProperty('id') && query['id'].length > 0) {
+            _query['_id'] = (query['id'].length === 24) ? ObjectID(query['id']) : query['id'];
+        }
+
+        if (query.hasOwnProperty('institucionDependencia') && query['institucionDependencia'].length > 0) {
+            _query['institucionDependencia.nombre'] = { $regex: query['institucionDependencia'], $options: 'i' };
+        }
     }
 
+    console.log(query);
     console.log(_query);
 
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
         const db = client.db();
         const spic = db.collection('spic');
         const skip = page === 1 ? 0 : (page - 1) * pageSize;
-        let cursor = spic.find(_query).skip(skip).limit(pageSize);
+        let cursor = spic.find(_query).skip(skip).limit(pageSize).collation({ locale: "en", strength: 1 });
 
         if (JSON.stringify(_sort) !== '{}') {
             cursor.sort(_sort);
@@ -216,21 +266,29 @@ router.post('/spic', (req, res) => {
         cursor.count().then(totalRows => {
             cursor.toArray().then(data => {
                 //console.log(data);
-                let tR = Math.ceil(totalRows/pageSize)>page;
+                let hasNextPage = (page * pageSize) < totalRows;
+                // let tR = Math.ceil(totalRows / pageSize) > page;
                 res.json({
                     pagination: {
                         pageSize: pageSize,
                         page: page,
                         totalRows: totalRows,
-                        hasNextPage: tR
+                        hasNextPage: hasNextPage
                     },
                     results: data.map(d => {
-                        d.id = d._id.toString();
-                        return d;
+                        let id = d._id.toString();
+                        delete d._id;
+                        return { id: id, ...d };
                     })
                 });
             });
         });
+    }).catch(err => {
+        res.json({
+            code: "021",
+            message: "fail database"
+        })
+        console.log(err);
     });
 });
 module.exports = router;
