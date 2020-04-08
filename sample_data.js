@@ -157,6 +157,11 @@ const responsabilidades = [
 	}
 ];
 
+const ramo = [
+	{ clave: 28, valor: 'Participaciones a Entidades Federativas y Municipios' },
+	{ clave: 33, valor: 'Aportaciones Federales para Entidades Federativas y Municipios' }
+];
+
 const getRandomIntInclusive = (min, max) => {
 	min = Math.ceil(min);
 	max = Math.floor(max);
@@ -226,6 +231,7 @@ const getEntity = () => randomChoice(entities);
 const getProcedure = () => randomChoice(procedimientos);
 const getRoles = () => randomChoice(responsabilidades);
 const getArea = () => randomChoice(tipoArea);
+const getRamo = () => randomChoice(ramo);
 
 module.exports = {
 	randomChoice,
@@ -237,5 +243,6 @@ module.exports = {
 	getEntity,
 	getProcedure,
 	getRoles,
-	getArea
+	getArea,
+	getRamo
 };

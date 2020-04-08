@@ -11,7 +11,8 @@ const {
 	getProcedure,
 	getRoles,
 	getArea,
-	randomChoice
+	randomChoice,
+	getRamo
 } = require('./sample_data');
 
 let nrows = process.argv[2];
@@ -31,8 +32,7 @@ for (let i = 0; i < nrows; i++) {
 	data.push({
 		fechaCaptura: new Date().toISOString(),
 		ejercicioFiscal: randomChoice([ '2016', '2017', '2018', '2019', '2020' ]),
-		//periodoEjercicio
-		//ramo
+		ramo: getRamo(),
 		rfc: '',
 		curp: '',
 		nombres: ng.name,
